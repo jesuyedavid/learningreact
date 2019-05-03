@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-
+import axios from "axios";
 function Square(props)
 {
   return (
@@ -61,6 +61,51 @@ class Board extends React.Component {
         </div>
       </div>
     );
+  }
+}
+
+class PhoneList extends React.Component {
+  state = {
+    error: null,
+    isLoaded: false,
+    items: []
+  };
+
+  componentDidMount() {
+    axios.get("https://jsonplaceholder.typicode.com/users").then(
+      result => {
+        this.setState({
+          isLoaded: true,
+          items: result.data
+        });
+      },
+
+      error => {
+        this.setState({
+          isLoaded: true,
+          error
+        });
+      }
+    );
+  }
+
+  render() {
+    const { error, isLoaded, items } = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return (
+        <ul>
+          {items.map(item => (
+            <li key={item.username}>
+              {item.username}: {item.name}
+            </li>
+          ))}
+        </ul>
+      );
+    }
   }
 }
 
@@ -135,6 +180,7 @@ class Game extends React.Component {
             onClick = {(i) => this.handleClick(i)}
           />
         </div>
+        <PhoneList />
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
